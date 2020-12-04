@@ -1,0 +1,7 @@
+---
+- hosts: k8s0
+  tasks:
+    - name: hostname
+      become: true
+      hostname:
+        name: '{{ inventory_hostname }}'
