@@ -1,0 +1,8 @@
+---
+- name: prometheus-config-reload
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/pkill
+      - --signal
+      - SIGHUP
+      - prometheus$

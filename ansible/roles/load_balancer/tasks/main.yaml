@@ -1,8 +1,126 @@
 ---
 - name: apt install packages
-  apt:
+  ansible.builtin.apt:
     name: '{{ lb_apt_packages }}'
     state: '{{ lb_apt_packages_state }}'
   tags:
     - lb:apt
     - lb:packages
+
+- name: prometheus config
+  ansible.builtin.copy:
+    dest: /etc/prometheus/prometheus.yml
+    content: |
+      global:
+        scrape_interval:     15s
+        evaluation_interval: 15s
+
+      scrape_configs:
+        - job_name: prometheus
+          static_configs:
+            - targets: ['localhost:9090']
+
+        - job_name: node
+          static_configs:
+            - targets: ['localhost:9100']
+
+        - job_name: haproxy
+          static_configs:
+            - targets: ['localhost:9101']
+
+  notify: prometheus-config-reload
+  tags:
+    - lb:prometheus
+
+- name: enable and start prometheus
+  ansible.builtin.systemd:
+    name: prometheus.service
+    state: started
+    enabled: true
+  tags:
+    - lb:prometheus
+
+- name: enable and start node-exporter
+  ansible.builtin.systemd:
+    name: prometheus-node-exporter.service
+    state: started
+    enabled: true
+  tags:
+    - lb:prometheus
+
+- name: haproxy config
+  ansible.builtin.copy:
+    dest: /etc/haproxy/haproxy.cfg
+    content: |
+      global
+        chroot /var/lib/haproxy
+        user haproxy
+        group haproxy
+        daemon
+
+      defaults
+        balance roundrobin
+        maxconn 3000
+        mode tcp
+        retries 3
+        timeout check 5s
+        timeout connect 5s
+        timeout client  30s
+        timeout server  30s
+
+      frontend stats
+        bind *:9101
+        mode http
+        option http-use-htx
+        http-request use-service prometheus-exporter if { path /metrics }
+        stats enable
+        stats uri /stats
+        stats refresh 10s
+
+      frontend https_443
+        bind 0.0.0.0:443
+        mode tcp
+        maxconn 500
+        default_backend nodes
+
+      backend nodes
+        option tcp-check
+        default-server check maxconn 100
+        server rpi-0.k8s0.weirwd.net 192.168.1.192:9090 check
+  tags:
+    - lb:haproxy
+
+- name: enable and start haproxy
+  ansible.builtin.systemd:
+    name: haproxy.service
+    state: started
+    enabled: true
+  tags:
+    - lb:haproxy
+
+# FIXME move to configuration stage
+- name: allow connections on 443
+  iptables:
+    chain: INPUT
+    source: 192.168.1.0/24
+    destination_port: '443'
+    protocol: tcp
+    ctstate: NEW
+    syn: match
+    jump: ACCEPT
+  tags:
+    - lb:iptables
+    - iptables
+
+- name: allow connections on 9090
+  iptables:
+    chain: INPUT
+    source: 192.168.1.0/24
+    destination_port: '9090'
+    protocol: tcp
+    ctstate: NEW
+    syn: match
+    jump: ACCEPT
+  tags:
+    - lb:iptables
+    - iptables

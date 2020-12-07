@@ -1,10 +1,9 @@
 ---
 lb_apt_packages:
-  # - haproxy
+  - haproxy
   - prometheus
-  # - prometheus-haproxy-exporter
   - prometheus-node-exporter
   # - prometheus-process-exporter
-  # - vim-haproxy
+  - vim-haproxy
 
 lb_apt_packages_state: present
