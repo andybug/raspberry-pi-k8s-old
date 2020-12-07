@@ -1,0 +1,174 @@
+---
+- name: hostname
+  hostname:
+    name: '{{ inventory_hostname }}'
+  tags:
+    - ubuntu:hostname
+
+- name: install apt packages
+  apt:
+    name: '{{ ubuntu_apt_packages }}'
+    state: '{{ ubuntu_apt_packages_state }}'
+  tags:
+    - ubuntu:apt
+    - ubuntu:packages
+
+- name: create and configure users
+  tags:
+    - ubuntu:users
+  block:
+    - name: user
+      ansible.builtin.user:
+        name: '{{ item.name }}'
+        create_home: yes
+        group: '{{ item.group | default(ubuntu_users_default_group) }}'
+        password_lock: yes
+        shell: '{{ item.shell | default(ubuntu_users_default_shell) }}'
+        state: '{{ item.state | default("present") }}'
+        system: no
+      loop: '{{ cluster_users }}'
+
+    - name: groups
+      ansible.builtin.user:
+        name: '{{ item.name }}'
+        append: yes
+        groups: '{{ item.groups }}'
+      when: item.groups is defined
+      loop: '{{ cluster_users }}'
+
+    - name: authorized_keys
+      ansible.posix.authorized_key:
+        user: '{{ item.name }}'
+        state: '{{ item.state | default("present") }}'
+        key: '{{ item.key }}'
+      when: item.key is defined
+      loop: '{{ cluster_users }}'
+
+    - name: sudoers
+      ansible.builtin.copy:
+        dest: '/etc/sudoers.d/50-{{ item.name }}'
+        content: |
+          {{ item.name }} ALL=(ALL) NOPASSWD:ALL
+      when: item.admin is defined and item.admin
+      loop: '{{ cluster_users }}'
+
+- name: configure iptables
+  tags:
+    - ubuntu:iptables
+    - iptables
+  block:
+    - name: tempfile for iptables rules
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .rules
+      register: iptables_rules_tempfile
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: save iptables rules
+      ansible.builtin.command:
+        argv:
+          - /sbin/iptables-save
+          - -f
+          - '{{ iptables_rules_tempfile.path }}'
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: create DEFAULT-INPUT chain
+      ansible.builtin.command:
+        argv:
+          - /sbin/iptables
+          - -N
+          - DEFAULT-INPUT
+      register: result
+      changed_when: "result.rc == 0"
+      failed_when: false
+      when: not ansible_check_mode
+
+    - name: allow related and established connections
+      iptables:
+        chain: DEFAULT-INPUT
+        ctstate: ESTABLISHED,RELATED
+        jump: ACCEPT
+      notify:
+        - netfilter-save
+
+    - name: allow inbound traffic on loopback
+      iptables:
+        chain: DEFAULT-INPUT
+        in_interface: lo
+        jump: ACCEPT
+      notify:
+        - netfilter-save
+
+    - name: allow new ssh connections
+      iptables:
+        chain: DEFAULT-INPUT
+        source: '{{ cluster_ssh_allowed_cidr }}'
+        destination_port: '22'
+        protocol: tcp
+        ctstate: NEW
+        syn: match
+        jump: ACCEPT
+      notify:
+        - netfilter-save
+
+    # INPUT
+
+    - name: INPUT jump to DEFAULT-INPUT
+      iptables:
+        chain: INPUT
+        jump: DEFAULT-INPUT
+      notify:
+        - netfilter-save
+
+    - name: set policy for INPUT chain to DROP
+      iptables:
+        chain: INPUT
+        policy: DROP
+      notify:
+        - netfilter-save
+
+    # FORWARD
+
+    - name: set policy for FORWARD chain to DROP
+      iptables:
+        chain: FORWARD
+        policy: DROP
+      notify:
+        - netfilter-save
+
+    # OUTPUT
+
+    - name: set policy for OUTPUT chain to ACCEPT
+      iptables:
+        chain: OUTPUT
+        policy: ACCEPT
+      notify:
+        - netfilter-save
+
+  rescue:
+    - name: restore iptables rules
+      ansible.builtin.command:
+        argv:
+          - /sbin/iptables-restore
+          - '{{ iptables_rules_tempfile.path }}'
+      when: not ansible_check_mode
+
+  always:
+    - name: remove tempfile
+      ansible.builtin.file:
+        path: '{{ iptables_rules_tempfile.path }}'
+        state: absent
+      changed_when: false
+      when: |
+        iptables_rules_tempfile.path is defined
+        and not ansible_check_mode
+
+- name: enable iptables service (netfilter)
+  systemd:
+    name: iptables.service
+    enabled: true
+  tags:
+    - ubuntu-iptables
+    - iptables

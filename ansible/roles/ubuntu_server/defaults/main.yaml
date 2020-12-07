@@ -1,0 +1,11 @@
+---
+ubuntu_apt_packages:
+  - iptables
+  - iptables-persistent
+  - vim
+  - zsh
+
+ubuntu_apt_packages_state: present
+
+ubuntu_users_default_group: users
+ubuntu_users_default_shell: /bin/zsh

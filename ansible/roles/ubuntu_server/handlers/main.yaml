@@ -1,0 +1,6 @@
+---
+- name: netfilter-save
+  ansible.builtin.command:
+    argv:
+      - /sbin/netfilter-persistent
+      - save

@@ -1,5 +1,12 @@
 ---
 k8s0:
+  vars:
+    cluster_ssh_allowed_cidr: 192.168.1.0/24
+    cluster_users:
+      - name: andy
+        admin: true
+        key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMETC12PKzMRp0kA7iC1BPL3aXSjUHUoZx2mqFiVICoM andy@andybug.com
+
   children:
     load_balancers:
       hosts:

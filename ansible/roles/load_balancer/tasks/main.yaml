@@ -1,0 +1,8 @@
+---
+- name: apt install packages
+  apt:
+    name: '{{ lb_apt_packages }}'
+    state: '{{ lb_apt_packages_state }}'
+  tags:
+    - lb:apt
+    - lb:packages

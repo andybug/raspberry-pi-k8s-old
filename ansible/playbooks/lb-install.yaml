@@ -1,0 +1,16 @@
+---
+- hosts: load_balancers
+  tasks:
+    - import_role:
+        name: ../roles/ubuntu_server
+      become: true
+      tags:
+        - ubuntu
+        - ubuntu-server
+
+    - import_role:
+        name: ../roles/load_balancer
+      become: true
+      tags:
+        - load-balancer
+        - lb
