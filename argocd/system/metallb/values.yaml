@@ -4,8 +4,7 @@ metallb:
 
   configInline:
     address-pools:
-      - name: cluster-pool # FIXME
+      - name: default
         protocol: layer2
         addresses:
-          #- 10.27.50.30-10.27.50.35
-          - 172.21.1.0/24
+          - 192.168.1.201-192.168.1.232
