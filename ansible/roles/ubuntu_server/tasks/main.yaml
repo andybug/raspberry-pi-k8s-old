@@ -5,6 +5,22 @@
   tags:
     - ubuntu:hostname
 
+- name: hosts file
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1.*{{ inventory_hostname }}'
+    line: '127.0.1.1 {{ inventory_hostname }} {{ inventory_hostname.split(".")[0] }}'
+  tags:
+    - ubuntu:hostname
+
+- name: apt upgrade
+  import_tasks: update.yaml
+  tags:
+    - never
+    - ubuntu:upgrade
+    - ubuntu:apt
+    - ubuntu:packages
+
 - name: install apt packages
   apt:
     name: '{{ ubuntu_apt_packages }}'
@@ -125,7 +141,7 @@
     - name: set policy for INPUT chain to DROP
       iptables:
         chain: INPUT
-        policy: DROP
+        policy: ACCEPT # FIXME
       notify:
         - netfilter-save
 

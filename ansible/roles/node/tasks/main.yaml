@@ -1,0 +1,56 @@
+---
+# https://rancher.com/docs/k3s/latest/en/installation/installation-requirements/
+- name: allow connections on 6443 (Kubernetes API)
+  ansible.builtin.iptables:
+    chain: INPUT
+    source: 192.168.1.0/24
+    destination_port: '6443'
+    protocol: tcp
+    # ctstate: NEW
+    # syn: match
+    jump: ACCEPT
+  tags:
+    - node:iptables
+    - iptables
+
+- name: allow connections on 8472 (Flannel VXLAN)
+  ansible.builtin.iptables:
+    chain: INPUT
+    source: 192.168.1.0/24
+    destination_port: '8472'
+    protocol: udp
+    jump: ACCEPT
+  tags:
+    - node:iptables
+    - iptables
+
+- name: allow connections on 10250 (kubelet/metrics server)
+  ansible.builtin.iptables:
+    chain: INPUT
+    source: 192.168.1.0/24
+    destination_port: '10250'
+    protocol: tcp
+    # ctstate: NEW
+    # syn: match
+    jump: ACCEPT
+  tags:
+    - node:iptables
+    - iptables
+
+# - name: netfilter-save
+#   ansible.builtin.command:
+#     argv:
+#       - /sbin/netfilter-persistent
+#       - save
+#   tags:
+#     - node:iptables
+#     - iptables
+
+- name: set kernel cmdline options
+  ansible.builtin.copy:
+    dest: /boot/firmware/cmdline.txt
+    content: |
+      net.ifnames=0 dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1
+  tags:
+    - never
+    - node:cmdline

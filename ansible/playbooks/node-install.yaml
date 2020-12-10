@@ -1,0 +1,15 @@
+---
+- hosts: nodes
+  tasks:
+    - import_role:
+        name: ../roles/ubuntu_server
+      become: true
+      tags:
+        - ubuntu
+        - ubuntu-server
+
+    - import_role:
+        name: ../roles/node
+      become: true
+      tags:
+        - node
