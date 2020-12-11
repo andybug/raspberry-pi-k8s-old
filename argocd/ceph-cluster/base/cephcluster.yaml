@@ -8,7 +8,6 @@ spec:
   dataDirHostPath: /var/lib/rook
   mon:
     count: 3
-    allowMultiplePerNode: false
   dashboard:
     enabled: true
   # cluster level storage configuration and selection
@@ -21,3 +20,13 @@ spec:
       databaseSizeMB: "1024" # this value can be removed for environments with normal sized disks (100 GB or larger)
       journalSizeMB: "1024"  # this value can be removed for environments with normal sized disks (20 GB or larger)
       osdsPerDevice: "1"
+  healthCheck:
+    livenessProbe:
+      mgr:
+        disabled: false
+        probe:
+          # httpGet:
+          #   path: /
+          #   port: 9283
+          initialDelaySeconds: 180
+          # periodSeconds: 3
