@@ -5,6 +5,9 @@ This comes from the argo-cd repo and getting started guide:
 - <https://registry.hub.docker.com/r/cyrilix/argocd>
 - <https://registry.hub.docker.com/r/argoproj/argocd>
 
-argocd does not currently publish `arm64` images; replace it with cyrilix's build:
+    kustomize build . | kubectl apply -f -
+    kubectl port-forward -n argocd service/argocd-server 8080:443
+    argocd login localhost:8080
+    argocd account list
+    argocd account update-password --account <name> --current-password <current-admin> --new-password <new-user-password>
 
-    sed -r -e 's#argoproj/argocd:#cyrilix/argocd:#'

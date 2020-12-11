@@ -2,6 +2,16 @@ metallb:
   prometheus:
     enabled: false
 
+  controller:
+    image:
+      repository: metallb/controller
+      tag: main-arm64
+
+  speaker:
+    image:
+      repository: metallb/speaker
+      tag: main-arm64
+
   configInline:
     address-pools:
       - name: default
