@@ -1,51 +1,4 @@
 ---
-# https://rancher.com/docs/k3s/latest/en/installation/installation-requirements/
-- name: allow connections on 6443 (Kubernetes API)
-  ansible.builtin.iptables:
-    chain: INPUT
-    source: 192.168.1.0/24
-    destination_port: '6443'
-    protocol: tcp
-    # ctstate: NEW
-    # syn: match
-    jump: ACCEPT
-  tags:
-    - node:iptables
-    - iptables
-
-- name: allow connections on 8472 (Flannel VXLAN)
-  ansible.builtin.iptables:
-    chain: INPUT
-    source: 192.168.1.0/24
-    destination_port: '8472'
-    protocol: udp
-    jump: ACCEPT
-  tags:
-    - node:iptables
-    - iptables
-
-- name: allow connections on 10250 (kubelet/metrics server)
-  ansible.builtin.iptables:
-    chain: INPUT
-    source: 192.168.1.0/24
-    destination_port: '10250'
-    protocol: tcp
-    # ctstate: NEW
-    # syn: match
-    jump: ACCEPT
-  tags:
-    - node:iptables
-    - iptables
-
-# - name: netfilter-save
-#   ansible.builtin.command:
-#     argv:
-#       - /sbin/netfilter-persistent
-#       - save
-#   tags:
-#     - node:iptables
-#     - iptables
-
 - name: set kernel cmdline options
   ansible.builtin.copy:
     dest: /boot/firmware/cmdline.txt
@@ -54,3 +7,38 @@
   tags:
     - never
     - node:cmdline
+
+- name: start and enable iscsid
+  ansible.builtin.systemd:
+    name: iscsid.service
+    enabled: yes
+    state: started
+  tags:
+    - node:iscsi
+    - node:iscsid
+
+- name: longhorn directory
+  ansible.builtin.file:
+    path: /var/lib/longhorn
+    state: directory
+  tags:
+    - node:longhorn
+
+- name: format data partition
+  community.general.filesystem:
+    dev: '{{ node_data_partition }}'
+    force: no
+    fstype: ext4
+    opts: -L longhorn
+  tags:
+    - node:longhorn
+
+- name: mount longhorn partition
+  ansible.posix.mount:
+    path: /var/lib/longhorn
+    src: LABEL=longhorn
+    fstype: ext4
+    opts: defaults
+    state: mounted
+  tags:
+    - node:longhorn

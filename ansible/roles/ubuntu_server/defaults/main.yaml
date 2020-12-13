@@ -1,11 +1,13 @@
 ---
 ubuntu_apt_packages:
   - iptables
-  - iptables-persistent
+  - htop
+  - ncdu
   - vim
   - zsh
 
 ubuntu_apt_packages_state: present
+ubuntu_apt_upgrade: safe
 
 ubuntu_users_default_group: users
 ubuntu_users_default_shell: /bin/zsh

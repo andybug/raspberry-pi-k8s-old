@@ -1,0 +1,16 @@
+---
+- hosts: nodes
+  become: true
+  tasks:
+    - name: k3s killall script
+      command: /usr/local/bin/k3s-killall.sh
+
+    - name: k3s uninstall script
+      command:
+        cmd: /usr/local/bin/k3s-uninstall.sh
+        removes: /usr/local/bin/k3s-uninstall.sh
+
+    - name: remove rancher directory
+      ansible.builtin.file:
+        path: /var/lib/rancher
+        state: absent

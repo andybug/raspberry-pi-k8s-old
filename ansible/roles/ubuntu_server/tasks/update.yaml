@@ -1,6 +1,7 @@
 ---
-- name: apt dist upgrade
+- name: apt upgrade
   apt:
+    autoremove: yes
     update_cache: yes
     cache_valid_time: 3600
-    upgrade: dist
+    upgrade: '{{ ubuntu_apt_upgrade }}'
