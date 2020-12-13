@@ -2,6 +2,11 @@
 - hosts: nodes
   become: true
   tasks:
+    - name: stop k3s
+      ansible.builtin.systemd:
+        name: k3s-agent.service
+        state: stopped
+
     - name: k3s killall script
       command: /usr/local/bin/k3s-killall.sh
 
