@@ -2,15 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: argocd
 resources:
-  - base/namespace.yaml
   - https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.1/manifests/install.yaml
-  - base/metrics-sm.yaml
-  - base/repo-server-metrics-sm.yaml
-  - base/server-metrics-sm.yaml
+  # - base/metrics-sm.yaml
+  # - base/repo-server-metrics-sm.yaml
+  # - base/server-metrics-sm.yaml
 
-patchesStrategicMerge:
-  - overlays/production/argocd-cm.yaml
-  - overlays/production/argocd-ssh-known-hosts-cm.yaml
+# patchesStrategicMerge:
+#   - overlays/production/argocd-cm.yaml
+#   - overlays/production/argocd-ssh-known-hosts-cm.yaml
+
 images:
   - name: argoproj/argocd
     newName: cyrilix/argocd
