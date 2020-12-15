@@ -3,7 +3,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: argocd
-  #namespace: argocd
 spec:
   destination:
     namespace: argocd
@@ -11,5 +10,19 @@ spec:
   project: system
   source:
     path: argocd/system/argocd
+    repoURL: git@git.andybug.com:andy/k8s0.git
+    targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: system
+  source:
+    path: argocd/system/metallb
     repoURL: git@git.andybug.com:andy/k8s0.git
     targetRevision: HEAD

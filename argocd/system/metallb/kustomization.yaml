@@ -1,0 +1,32 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: metallb-system
+
+resources:
+  - github.com/metallb/metallb//manifests?ref=v0.9.5
+  - config/configmap.yaml
+
+commonLabels:
+  app.kubernetes.io/name: metallb
+  app.kubernetes.io/version: 0.9.5
+
+patches:
+  - patch: |
+      - op: add
+        path: '/metadata/labels/env'
+        value: all
+      - op: add
+        path: '/metadata/labels/prj'
+        value: system
+    target:
+      kind: Namespace
+
+  # - patch: |
+  #     - op: add
+  #       path: /metadata/labels/app.kubernetes.io~1component
+  #       value: controller
+  #     - op: remove
+  #       path: /metadata/labels/component
+  #   target:
+  #     labelSelector: "component=controller"
