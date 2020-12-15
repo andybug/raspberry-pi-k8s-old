@@ -10,7 +10,13 @@ kube-prometheus-stack:
               requests:
                 storage: 1Gi
 
+  kubeControllerManager:
+    enabled: false
+
   kubeEtcd:
+    enabled: false
+
+  kubeStateMetrics:
     enabled: false
 
   prometheus:
