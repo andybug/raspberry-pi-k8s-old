@@ -19,4 +19,4 @@ This comes from the argo-cd repo and getting started guide:
     argocd repocreds add git@git.andybug.com:andy/k8s0.git --ssh-private-key-path  ~/tmp/ceph/argocd/id_argocd
     ssh-keyscan git.andybug.com | argocd cert add-ssh --batch
     argocd repo add git@git.andybug.com:andy/k8s0.git --ssh-private-key-path ~/tmp/ceph/argocd/id_argocd
-
+    argocd app create system-apps --dest-name in-cluster --repo git@git.andybug.com:andy/k8s0.git --path argocd/system/apps --dest-namespace argocd --project system
