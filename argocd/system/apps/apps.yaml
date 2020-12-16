@@ -26,3 +26,22 @@ spec:
     path: argocd/system/metallb
     repoURL: git@git.andybug.com:andy/k8s0.git
     targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+spec:
+  project: system
+  source:
+    repoURL: 'https://helm.traefik.io/traefik'
+    targetRevision: 9.11.0
+    helm:
+      values: |-
+        additionalArguments:
+          - "--providers.kubernetesingress.ingressclass=traefik-lb"
+    chart: traefik
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: traefik
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
