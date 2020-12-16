@@ -40,6 +40,7 @@ spec:
       values: |-
         additionalArguments:
           - "--providers.kubernetesingress.ingressclass=traefik-lb"
+          - "--metrics.prometheus"
     chart: traefik
   destination:
     server: 'https://kubernetes.default.svc'
