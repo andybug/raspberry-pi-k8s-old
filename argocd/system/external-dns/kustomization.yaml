@@ -26,3 +26,9 @@ patchesStrategicMerge:
 #     - op: add
 #       path: /spec/template/spec/containers/0/args/-
 #       value: '--provider=aws'
+
+# this is only needed until v0.7.5 is actually released
+images:
+  - name: k8s.gcr.io/external-dns/external-dns
+    newName: docker.io/bitnami/external-dns
+    newTag: 0.7.5-debian-10-r4
