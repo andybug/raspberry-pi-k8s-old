@@ -30,5 +30,5 @@ patchesStrategicMerge:
 # this is only needed until v0.7.5 is actually released
 images:
   - name: k8s.gcr.io/external-dns/external-dns
-    newName: docker.io/bitnami/external-dns
-    newTag: 0.7.5-debian-10-r4
+    newName: raspbernetes/external-dns
+    newTag: 1a8e2310ca97a3758d85a3a435e491911a486e7d
