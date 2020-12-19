@@ -52,13 +52,30 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: external-dns
+  name: longhorn
 spec:
   destination:
-    namespace: external-dns
+    namespace: longhorn
     server: https://kubernetes.default.svc
   project: system
   source:
-    path: argocd/system/external-dns
-    repoURL: git@git.andybug.com:andy/k8s0.git
-    targetRevision: HEAD
+    chart: longhorn
+    repoURL: https://charts.longhorn.io
+    targetRevision: 1.1.0
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: external-dns
+# spec:
+#   destination:
+#     namespace: external-dns
+#     server: https://kubernetes.default.svc
+#   project: system
+#   source:
+#     path: argocd/system/external-dns
+#     repoURL: git@git.andybug.com:andy/k8s0.git
+#     targetRevision: HEAD
