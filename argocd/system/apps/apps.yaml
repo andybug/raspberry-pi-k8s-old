@@ -65,6 +65,62 @@ spec:
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linkerd
+spec:
+  project: system
+  source:
+    repoURL: 'https://helm.linkerd.io/stable'
+    targetRevision: 2.9.1
+    helm:
+      values: |
+        global:
+          identityTrustAnchorsPEM: |
+              -----BEGIN CERTIFICATE-----
+              MIIBlTCCATqgAwIBAgIPbD/fkjxT5WfKjSYLTSiRMAoGCCqGSM49BAMCMCkxJzAl
+              BgNVBAMTHmlkZW50aXR5LmxpbmtlcmQuY2x1c3Rlci5sb2NhbDAeFw0yMDEyMTkw
+              MDU2MDRaFw0zMDEyMTcwMDU2MDRaMCkxJzAlBgNVBAMTHmlkZW50aXR5Lmxpbmtl
+              cmQuY2x1c3Rlci5sb2NhbDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOahVahN
+              haJ7Rmod917WI6WAlyOkV/9m1lRHDlvoNSbWWALOHeqOS0Cjz7kq0PNwrdft6L/J
+              4kF2W0RC93NSCTmjRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/
+              AgEBMB0GA1UdDgQWBBT4cvFab4J1+BD7kV+i7M9uLDh9yDAKBggqhkjOPQQDAgNJ
+              ADBGAiEAjWEZ5gi8M4UjMZgCMuD0DpTxuUVB06+bj1llI4CqDlICIQDyvNqAU6Kp
+              KRaJgaTfzCOhzdyXNvhm7CM6jU60qzWdpg==
+              -----END CERTIFICATE-----
+
+        identity:
+          issuer:
+            crtExpiry: 2025-12-17T18:58:01Z
+            tls:
+              crtPEM: |
+                  -----BEGIN CERTIFICATE-----
+                  MIIBlzCCATygAwIBAgIRAMYjCJGWp//Ohkgr8O7oucEwCgYIKoZIzj0EAwIwKTEn
+                  MCUGA1UEAxMeaWRlbnRpdHkubGlua2VyZC5jbHVzdGVyLmxvY2FsMB4XDTIwMTIx
+                  OTAwNTgwMVoXDTI1MTIxODAwNTgwMVowKTEnMCUGA1UEAxMeaWRlbnRpdHkubGlu
+                  a2VyZC5jbHVzdGVyLmxvY2FsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEZ2m7
+                  MUxoiLrZQUgTbMQBrtbRjnk7EH9HE2t4ADFSDfvzmJFBAdNf92/uwQ8lON78/czZ
+                  ZAewNWh2/afDOl8F16NFMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYB
+                  Af8CAQAwHQYDVR0OBBYEFMurMQ731YJjN1beo0UWzQNW1RdaMAoGCCqGSM49BAMC
+                  A0kAMEYCIQDykIx97NUSawWomUQZME8xPmdVMa3fPGYwIpiyzJNoQQIhAMmLQP7e
+                  ecYIOVF9QooSUAK62Z8Ajhrx7DPMJ3/yVQ3R
+                  -----END CERTIFICATE-----
+
+              keyPEM: |
+                  -----BEGIN EC PRIVATE KEY-----
+                  MHcCAQEEIH5kUNp34qj+rrboDlb4fOghNf/B2iD3BR/YDLfey+1LoAoGCCqGSM49
+                  AwEHoUQDQgAEZ2m7MUxoiLrZQUgTbMQBrtbRjnk7EH9HE2t4ADFSDfvzmJFBAdNf
+                  92/uwQ8lON78/czZZAewNWh2/afDOl8F1w==
+                  -----END EC PRIVATE KEY-----
+    chart: linkerd2
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: linkerd
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
 
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
