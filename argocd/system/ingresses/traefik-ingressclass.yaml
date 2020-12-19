@@ -4,6 +4,6 @@ kind: IngressClass
 metadata: 
   name: traefik-lb
   annotations:
-    ingressclass.kubernetes.io/is-default-class: true
+    ingressclass.kubernetes.io/is-default-class: "true"
 spec: 
   controller: traefik.io/ingress-controller
