@@ -121,6 +121,64 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+spec:
+  project: system
+  source:
+    repoURL: 'https://helm.releases.hashicorp.com'
+    targetRevision: 0.8.0
+    helm:
+      values: |
+        global:
+          tlsDisable: false
+
+        injector:
+          enabled: false
+
+        server:
+          annotations:
+            linkerd.io/inject: enabled
+
+          extraEnvironmentVars:
+            VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
+
+          extraVolumes:
+          - type: secret
+            name: vault-server-tls
+
+          dataStorage:
+            size: 10Gi
+            storageClass: longhorn
+
+          standalone:
+            config: |
+                ui = true
+
+                listener "tcp" {
+                  address = "[::]:8200"
+                  cluster_address = "[::]:8201"
+                  tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+                  tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
+                  tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
+                }
+
+                storage "file" {
+                  path = "/vault/data"
+                }
+
+        ui:
+          enabled: true
+    chart: vault
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: vault
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
 
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
