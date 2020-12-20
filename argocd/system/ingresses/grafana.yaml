@@ -1,0 +1,24 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: grafana-k8s0-weirwd-net
+  namespace: prometheus
+spec:
+  secretName: grafana-k8s0-weirwd-net-tls
+  duration: 72h0m0s
+  renewBefore: 24h0m0s
+  commonName: grafana.k8s0.weirwd.net
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - grafana.k8s0.weirwd.net
+  issuerRef:
+    name: vault-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
