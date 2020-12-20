@@ -38,6 +38,9 @@ spec:
     targetRevision: 9.11.0
     helm:
       values: |-
+        deployment:
+          podAnnotations:
+            linkerd.io/inject: enabled
         additionalArguments:
           - "--providers.kubernetesingress.ingressclass=traefik-lb"
           - "--metrics.prometheus"
