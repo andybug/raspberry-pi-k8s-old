@@ -1,4 +1,4 @@
 - op: add
-  path: "/metadata/annotations"
+  path: "/spec/template/metadata/annotations"
   value:
     linkerd.io/inject: enabled
