@@ -37,13 +37,13 @@ spec:
       priority: 10
       services:
         - name: argocd-server
-          port: 8080
+          port: 80
     - kind: Rule
       match: Host(`argocd.k8s0.weirwd.net`) && Headers(`Content-Type`, `application/grpc`)
       priority: 11
       services:
         - name: argocd-server
-          port: 8080
+          port: 80
           scheme: h2c
   tls:
     secretName: argocd-k8s0-weirwd-net-tls
