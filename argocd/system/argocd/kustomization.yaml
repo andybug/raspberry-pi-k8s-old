@@ -4,13 +4,14 @@ kind: Kustomization
 namespace: argocd
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.1/manifests/install.yaml
-  - base/ingress.yaml
+  # - base/ingress.yaml
   # - base/metrics-sm.yaml
   # - base/repo-server-metrics-sm.yaml
   # - base/server-metrics-sm.yaml
 
 patchesStrategicMerge:
   - overlays/k8s0/argocd-ssh-known-hosts-cm.yaml
+  - overlays/k8s0/argocd-server-deployment-command.yaml
 #   - overlays/production/argocd-cm.yaml
 
 images:

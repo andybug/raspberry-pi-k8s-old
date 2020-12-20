@@ -27,9 +27,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
   name: linkerd-k8s0-weirwd-net
   namespace: linkerd
 spec:
+  incgressClassName: traefik-lb
   tls:
   - hosts:
       - linkerd.k8s0.weirwd.net

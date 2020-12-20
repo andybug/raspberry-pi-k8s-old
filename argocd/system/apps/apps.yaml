@@ -179,6 +179,52 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+spec:
+  project: system
+  source:
+    repoURL: 'https://charts.jetstack.io'
+    targetRevision: v1.1.0
+    helm:
+      values: 'installCRDs: true'
+    chart: cert-manager
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: cert-manager
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-issuers
+spec:
+  project: system
+  source:
+    repoURL: 'git@git.andybug.com:andy/k8s0.git'
+    path: argocd/system/cert-manager-issuers
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: cluster-manager
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: system-ingresses
+spec:
+  project: system
+  source:
+    repoURL: 'git@git.andybug.com:andy/k8s0.git'
+    path: argocd/system/ingresses
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
 
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application

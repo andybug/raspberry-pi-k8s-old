@@ -1,0 +1,51 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-k8s0-weirwd-net
+  namespace: argocd
+spec:
+  secretName: argocd-k8s0-weirwd-net-tls
+  duration: 72h0m0s
+  renewBefore: 24h0m0s
+  commonName: argocd.k8s0.weirwd.net
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - argocd.k8s0.weirwd.net
+  issuerRef:
+    name: vault-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argocd-server
+  namespace: argocd
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`argocd.k8s0.weirwd.net`)
+      priority: 10
+      services:
+        - name: argocd-server
+          port: 8080
+    - kind: Rule
+      match: Host(`argocd.k8s0.weirwd.net`) && Headers(`Content-Type`, `application/grpc`)
+      priority: 11
+      services:
+        - name: argocd-server
+          port: 8080
+          scheme: h2c
+  tls:
+    secretName: argocd-k8s0-weirwd-net-tls
+    domains:
+      - main: argocd.k8s0.weirwd.net
