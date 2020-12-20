@@ -1,3 +1,4 @@
 - op: add
-  path: "/metadata/annotations/linkerd.io~1inject"
-  value: enabled
+  path: "/metadata/annotations"
+  value:
+    linkerd.io/inject: enabled
