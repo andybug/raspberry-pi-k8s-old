@@ -11,4 +11,5 @@ do
 	k3sup join --ip $agent --server-ip $MASTER_IP --user $USER --ssh-key "${SSH_KEY}" \
 		--k3s-extra-args "--node-name node-$index.k8s0.weirwd.net --node-ip ${agent}"
 	index=$(($index + 1))
+	read -s -k "?Press any key to continue."
 done
