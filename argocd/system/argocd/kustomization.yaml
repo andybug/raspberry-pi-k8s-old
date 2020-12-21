@@ -12,7 +12,7 @@ resources:
 patchesStrategicMerge:
   - overlays/k8s0/argocd-ssh-known-hosts-cm.yaml
   - overlays/k8s0/argocd-server-deployment-command.yaml
-#   - overlays/production/argocd-cm.yaml
+  - overlays/k8s0/argocd-cm.yaml
 
 patchesJson6902:
   - path: overlays/k8s0/argocd-server-deployment-annotations.yaml

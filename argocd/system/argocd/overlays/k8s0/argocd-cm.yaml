@@ -6,6 +6,12 @@ data:
   # add an additional local user with apiKey and login capabilities
   #   apiKey - allows generating API keys
   #   login - allows to login using UI
-  accounts.andy: apiKey,login
+  # accounts.andy: apiKey,login
   # disables user. User is enabled by default
   # accounts.andy.enabled: "false"
+  resource.customizations: |
+    networking.k8s.io/Ingress:
+      health.lua: |
+        hs = {}
+        hs.status = "Healthy"
+        return hs
