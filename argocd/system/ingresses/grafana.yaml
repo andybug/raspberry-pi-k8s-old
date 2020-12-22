@@ -6,8 +6,8 @@ metadata:
   namespace: prometheus
 spec:
   secretName: grafana-k8s0-weirwd-net-tls
-  duration: 72h0m0s
-  renewBefore: 24h0m0s
+  duration: 720h0m0s
+  renewBefore: 168h0m0s
   commonName: grafana.k8s0.weirwd.net
   privateKey:
     algorithm: RSA
