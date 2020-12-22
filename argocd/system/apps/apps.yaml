@@ -228,7 +228,103 @@ spec:
     targetRevision: HEAD
   destination:
     server: 'https://kubernetes.default.svc'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus
+spec:
+  project: system
+  source:
+    repoURL: 'https://prometheus-community.github.io/helm-charts'
+    targetRevision: 12.8.0
+    helm:
+      values: |
+        alertmanager:
+          ingress:
+            enabled: true
+            annotations:
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - alertmanager.k8s0.weirwd.net
+            tls:
+              - secretName: alertmanager-k8s0-weirwd-net-tls
+                hosts:
+                  - alertmanager.k8s0.weirwd.net
+          alertmanagerSpec:
+            podMetadata:
+              annotations:
+                linkerd.io/inject: enabled
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: longhorn
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 1Gi
 
+        grafana:
+          podAnnotations:
+            linkerd.io/inject: enabled
+          ingress:
+            enabled: true
+            annotations:
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - grafana.k8s0.weirwd.net
+            tls:
+              - secretName: grafana-k8s0-weirwd-net-tls
+                hosts:
+                  - grafana.k8s0.weirwd.net
+
+        kubeApiServer:
+          enabled: false
+
+        kubeControllerManager:
+          enabled: false
+
+        kubeEtcd:
+          enabled: false
+
+        kubeStateMetrics:
+          enabled: false
+
+        prometheus:
+          ingress:
+            enabled: true
+            annotations:
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - prometheus.k8s0.weirwd.net
+            tls:
+              - secretName: prometheus-k8s0-weirwd-net-tls
+                hosts:
+                  - prometheus.k8s0.weirwd.net
+          prometheusSpec:
+            # FIXME this is bugged -- fixed in next version
+            # podMetadata:
+            #   annotations:
+            #     linkerd.io/inject: enabled
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: longhorn
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
+
+        prometheusOperator:
+          admissionWebhooks:
+            patch:
+              enabled: false
+    chart: kube-prometheus-stack
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: prometheus
+
+---
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
