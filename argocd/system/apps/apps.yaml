@@ -72,6 +72,23 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: linkerd-bootstrap
+spec:
+  project: system
+  source:
+    repoURL: 'git@git.andybug.com:andy/k8s0.git'
+    path: argocd/system/linkerd-bootstrap
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: linkerd
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: linkerd
 spec:
   project: system
